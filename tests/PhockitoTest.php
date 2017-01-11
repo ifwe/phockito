@@ -31,7 +31,6 @@ interface PhockitoTest_MockInterface {
 /** Classes with different types of modifiers */
 final class PhockitoTest_Final {}
 
-
 /** Classes with different types of methods */
 class PhockitoTest_FooIsStatic { static function Foo() { } }
 class PhockitoTest_FooIsProtected { protected function Foo() { } }
@@ -249,7 +248,6 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('Quux', $mock->Quux());
 	}
-
 
 	/**
 	 * The raised error will be wrapped in an exception by PHPUnit

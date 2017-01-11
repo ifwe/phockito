@@ -6,11 +6,12 @@
  * Mocking framework based on Mockito for Java
  *
  * (C) 2011 Hamish Friedlander / SilverStripe. Distributable under the same license as SilverStripe.
+ * Patched for php 5.6 and php 7.0 compatibility.
  *
  * Example usage:
  *
  *   // Create the mock
- *   $iterator = Phockito.mock('ArrayIterator);
+ *   $iterator = Phockito.mock('ArrayIterator');
  *
  *   // Use the mock object - doesn't do anything, functions return null
  *   $iterator->append('Test');
@@ -24,7 +25,7 @@
  * Example stubbing:
  *
  *   // Create the mock
- *   $iterator = Phockito.mock('ArrayIterator);
+ *   $iterator = Phockito.mock('ArrayIterator');
  *
  *   // Stub in a value
  *   Phockito::when($iterator->offsetGet(0))->return('first');
@@ -126,7 +127,7 @@ class Phockito {
 				if (serialize($u) != serialize($v)) return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -140,7 +141,7 @@ class Phockito {
 			'class' => $class,
 			'instance' => $instance,
 			'method' => $method,
-			'args' => $args
+			'args' => array_map(function($arg) { return $arg; }, $args),  // Convert any references in $args to values.
 		));
 
 		// Look up any stubbed responses
@@ -156,7 +157,12 @@ class Phockito {
 		}
 	}
 
-	public static function __perform_response($response, $args) {
+	/**
+	 * @param array $response
+	 * @param mixed[] $args - Arguments padded to a function.
+	 */
+	public static function __perform_response($response, array $args) {
+		// TODO: Support mocking methods where some of the parameters are references.
 		if ($response['action'] == 'return') return $response['value'];
 		else if ($response['action'] == 'throw') {
 			/** @var Exception $class */
@@ -241,6 +247,7 @@ EOT;
 
 		// Track if the mocked class defines either of the __call and/or __toString magic methods
 		$has__call = $has__toString = false;
+		$has__call_type = '';
 
 		// Step through every method declared on the object
 		foreach ($reflect->getMethods() as $method) {
@@ -264,15 +271,18 @@ EOT;
 
 			// Array of defaults (sparse numeric)
 			self::$_defaults[$mockedClass][$method->name] = array();
-			
+
 			foreach ($method->getParameters() as $i => $parameter) {
 				// Turn the method arguments into a php fragment that calls a function with them
 				$callparams[] = '$'.$parameter->getName();
 
-				// Get the type hint of the parameter
-				if ($parameter->isArray()) $type = 'array ';
-				else if ($parameterClass = $parameter->getClass()) $type = '\\'.$parameterClass->getName().' ';
-				else $type = '';
+				// Get the (optional) type hint of the parameter (with space padding on the right)
+				$typeRaw = self::_get_type_hint_of_parameter($parameter);
+				$type = $typeRaw ? "$typeRaw " : "";
+
+				// Check if the parameter is variadic - it is possible there is a type hint before this token
+				// NOTE: isOptional() can be true while isDefaultValueAvailable from isDefaultValueAvailable in php 7.1
+				$hasDefault = ($parameter->isOptional() || $parameter->isDefaultValueAvailable()) && !$parameter->isVariadic();
 
 				try {
 					$defaultValue = $parameter->getDefaultValue();
@@ -284,9 +294,10 @@ EOT;
 				// Turn the method arguments into a php fragment the defines a function with them, including possibly the by-reference "&" and any default
 				$defparams[] =
 					$type .
+					($parameter->isVariadic() ? '...' : '') .
 					($parameter->isPassedByReference() ? '&' : '') .
 					'$'.$parameter->getName() .
-					($parameter->isOptional() ? '=' . var_export($defaultValue, true) : '')
+					($hasDefault ? '=' . var_export($defaultValue, true) : '')
 				;
 
 				// Finally cache the default value for matching against later
@@ -295,6 +306,11 @@ EOT;
 
 			// Turn that array into a comma seperated list
 			$defparams = implode(', ', $defparams); $callparams = implode(', ', $callparams);
+
+			// Need to have a method signature with the same return type in order to create a subclass. This will limit what can be returned by a mock.
+			// At runtime, an Error will be thrown (e.g. if no return value is mocked for a function with a return type of array)
+			$returnType = self::_get_return_type($method);
+			$defReturn = $returnType ? " : $returnType " : "";
 
 			// What to do if there's no stubbed response
 			if ($partial && !$method->isAbstract()) {
@@ -316,21 +332,26 @@ EOT;
 			}
 			elseif ($method->name == '__call') {
 				$has__call = true;
+				if ($method->getNumberOfParameters() >= 2 && $method->getParameters()[1]->isArray()) {
+					$has__call_type = 'array';
+				}
 			}
 			elseif ($method->name == '__toString') {
 				$has__toString = true;
 			}
 			// Build an overriding method that calls Phockito::__called, and never calls the parent
 			else {
+				$initArgsStatements = self::_create_array_from_func_args($method->getParameters());
 				$php[] = <<<EOT
-  $modifiers function $byRef {$method->name}( $defparams ){
-    \$args = func_get_args();
+  $modifiers function $byRef {$method->name}( $defparams )$defReturn{
+    // Usually \$args = func_get_args();, but special case for references
+    $initArgsStatements
 
-    \$backtrace = debug_backtrace();
+    \$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
     \$instance = \$backtrace[0]['type'] == '::' ? ('::'.$mockedClassString) : \$this->__phockito_instanceid;
 
     \$response = {$phockito}::__called($mockedClassString, \$instance, '{$method->name}', \$args);
-  
+
     \$result = \$response ? {$phockito}::__perform_response(\$response, \$args) : ($failover);
     return \$result;
   }
@@ -342,7 +363,7 @@ EOT;
 		$failover = ($partial && $has__call) ? "parent::__call(\$name, \$args)" : "null";
 
 		$php[] = <<<EOT
-  function __call(\$name, \$args) {
+  function __call(\$name, $has__call_type\$args) {
     \$response = {$phockito}::__called($mockedClassString, \$this->__phockito_instanceid, \$name, \$args);
 
     if (\$response) return {$phockito}::__perform_response(\$response, \$args);
@@ -369,12 +390,78 @@ EOT;
 
 		// Close off the class definition and eval it to create the class as an extant entity.
 		$php[] = '}';
+		$phpCode = implode("\n\n", $php);
 
 		// Debug: uncomment to spit out the code we're about to compile to stdout
-		// echo "\n" . implode("\n\n", $php) . "\n";
-
-		eval(implode("\n\n", $php));
+		// echo "\n" . $phpCode . "\n";
+		eval($phpCode);
 		return $mockerClass;
+	}
+
+	/**
+	 * @return string|null (e.g. 'SomeClass', 'string', (in php7.1) '?int', etc.)
+	 */
+	private static function _get_return_type(ReflectionMethod $method) {
+		if (PHP_VERSION < 7) {
+			return null;
+		}
+		$type = $method->getReturnType();
+		if (!is_object($type)) {
+			return null;
+		}
+		return (string)$type;
+	}
+
+	/**
+	 * @return string|null (e.g. 'SomeClass', 'string', (in php7.1) '?int', etc.)
+	 */
+	private static function _get_type_hint_of_parameter(ReflectionParameter $parameter) {
+		if ($parameter->isArray()) {
+			return 'array';
+		} else if ($parameterClass = $parameter->getClass()) {
+			return '\\'.$parameterClass->getName();
+		}
+		if (PHP_VERSION >= 7) {
+			$type = $parameter->getType();
+			if (!is_object($type)) {
+				return null;
+			}
+			return (string)$type;
+		}
+		return null;
+	}
+	/**
+	 * @param ReflectionParameter[] $parameters
+	 * @return string a command to initialize $args in an eval()ed mock.
+	 */
+	private static function _create_array_from_func_args(array $parameters) {
+		$hasReferences = false;
+		foreach ($parameters as $param) {
+			if ($param->isPassedByReference()) {
+				$hasReferences = true;
+			}
+		}
+		if (!$hasReferences) {
+			return "	\$args = func_get_args();\n";
+		}
+		$contents = "	\$args = [];\n";
+		foreach ($parameters as $param) {
+			$varName = '$' . $param->getName();
+			if ($param->isVariadic()) {
+				$contents .= "	foreach ($varName as \$__var) { \$args[] = \$__var; };\n";
+			} else if ($param->isPassedByReference()) {
+				$contents .= "	\$args[] = &$varName;\n";
+			} else {
+				$contents .= "	\$args[] = $varName;\n";
+			}
+		}
+		$contents .= <<<EOT
+    \$args = array_slice(\$args, 0, func_num_args());  // ignore default or variadic params
+    for (\$__i = count(\$args); \$__i < func_num_args(); \$__i++) {
+      \$args[] = func_get_arg(\$__i);
+    }
+EOT;
+		return $contents;
 	}
 
 	/**
@@ -428,7 +515,7 @@ EOT;
 
 	static function spy_instance($class /*, $constructor_arg_1, ... */) {
 		$spyClass = self::spy_class($class);
-		
+
 		$res = new $spyClass();
 
 		// Find the constructor args
@@ -445,7 +532,7 @@ EOT;
 				call_user_func_array($constructor, $constructor_args);
 			}
 		}
-		
+
 		// And done
 		return $res;
 	}
@@ -492,11 +579,11 @@ EOT;
 	static function reset($mock, $method = null) {
 		// Get the instance ID. Only resets instance-specific info ATM
 		$instance = $mock->__phockito_instanceid;
-		
+
 		// Remove any stored returns
 		if ($method) unset(self::$_responses[$instance][$method]);
 		else unset(self::$_responses[$instance]);
-		
+
 		// Remove all call history
 		foreach (self::$_call_list as $i => $call) {
 			if ($call['instance'] == $instance && ($method == null || $call['method'] == $method)) array_splice(self::$_call_list, $i, 1);
@@ -510,7 +597,7 @@ EOT;
 	 */
 	static function include_hamcrest($include_globals = true) {
 		set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).'/hamcrest-php/hamcrest');
-		
+
 		if ($include_globals) {
 			require_once('Hamcrest.php');
 			require_once('HamcrestTypeBridge_Globals.php');
@@ -655,7 +742,7 @@ class Phockito_VerifyBuilder {
 		$message  = "Failed asserting that method $called was called {$this->times} times - actually called $count times.\n";
 		$message .= "Wanted call:\n";
 		$message .= print_r($args, true);
-		
+
 		$message .= "Calls:\n";
 
 		foreach (Phockito::$_call_list as $call) {
