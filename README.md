@@ -1,6 +1,9 @@
-# Phockito - Mockito for PHP
+# Phockito - Mockito for PHP 7.x
+
+**This fork adds php 7.0 and 7.1 support**
 
 Mocking framework inspired by Mockito for Java
+
 
 Checkout [the original's website](http://mockito.org/) for the philosophy behind the API and more examples
 (although be aware that this is only a partial implementation for now)
@@ -74,7 +77,7 @@ $spy = Phockito::spy('A');
 print_r($spy->Foo()); // 'Foo'
 print_r($spy->Bar()); // 'FooBar'
 
-// Stub a method 
+// Stub a method
 Phockito::when($spy)->Foo()->return('Zap');
 print_r($spy->Foo()); // 'Zap'
 print_r($spy->Bar()); // 'ZapBar'
@@ -85,7 +88,7 @@ print_r($spy->Bar()); // 'ZapBar'
 Phockito allows the use of [Hamcrest](http://code.google.com/p/hamcrest/) matchers on any argument. Hamcrest is a library of "matching functions" that, given a value, return true if that value
 matches some rule.
 
-Hamcrest matchers are not included by default, so the first step is to call `Phockito::include_hamcrest();` immediately after including Phockito. 
+Hamcrest matchers are not included by default, so the first step is to call `Phockito::include_hamcrest();` immediately after including Phockito.
 Note that this will import the Hamcrest matchers as global functions - passing false as an argument will keep your namespace clean by making all matchers only available as static methods of `Hamcrest` (at the expense of worse looking test code).
 
 Once included you can pass a Hamcrest matcher as an argument in your when or verify rule, eg:
@@ -195,12 +198,12 @@ PHP, so we always return null. TODO: Support using phpdoc @return when declared.
 
 ## License
 
-Copyright (C) 2012 Hamish Friedlander / SilverStripe. 
+Copyright (C) 2012 Hamish Friedlander / SilverStripe.
 
-Distributable under either the same license as SilverStripe or the 
+Distributable under either the same license as SilverStripe or the
 Apache Public License V2 (http://www.apache.org/licenses/LICENSE-2.0.html) at your choice
 
-You don’t have to do anything special to choose  one license or the other and you don’t 
+You don’t have to do anything special to choose  one license or the other and you don’t
 have to notify anyone which license you are using.
 
 Hamcrest-php is under it's own license - see hamcrest-php/LICENSE.txt.
