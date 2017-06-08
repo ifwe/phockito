@@ -6,12 +6,15 @@
  * Mocking framework based on Mockito for Java
  *
  * (C) 2011 Hamish Friedlander / SilverStripe. Distributable under the same license as SilverStripe.
- * Patched for php 5.6 and php 7.0 compatibility.
+ *
+ * Patched for php 7.0 and php 7.1 compatibility. Incompatible with php 5.
+ *
+ * TODO: Patch to use SebastianBergmann\Exporter instead - print_r() will print `"2"` and `2` the same way, which is inconvenient.
  *
  * Example usage:
  *
  *   // Create the mock
- *   $iterator = Phockito.mock('ArrayIterator');
+ *   $iterator = Phockito::mock('ArrayIterator');
  *
  *   // Use the mock object - doesn't do anything, functions return null
  *   $iterator->append('Test');
@@ -25,7 +28,7 @@
  * Example stubbing:
  *
  *   // Create the mock
- *   $iterator = Phockito.mock('ArrayIterator');
+ *   $iterator = Phockito::mock('ArrayIterator');
  *
  *   // Stub in a value
  *   Phockito::when($iterator->offsetGet(0))->return('first');
@@ -82,13 +85,6 @@ class Phockito {
 	 * @var array
 	 */
 	public static $_is_interface = array();
-
-	/*
-	 * Should we attempt to support namespaces? Is PHP >= 5.3, basically
-	 */
-	public static function _has_namespaces() {
-		return version_compare(PHP_VERSION, '5.3.0', '>=');
-	}
 
 	/**
 	 * Checks if the two argument sets (passed as arrays) match. Simple serialized check for now, to be replaced by
@@ -158,11 +154,10 @@ class Phockito {
 	}
 
 	/**
-	 * @param array $response
 	 * @param mixed[] $args - Arguments padded to a function.
 	 */
 	public static function __perform_response($response, array $args) {
-		// TODO: Support mocking methods where some of the parameters are references.
+		// So, I have to pass an array of references?
 		if ($response['action'] == 'return') return $response['value'];
 		else if ($response['action'] == 'throw') {
 			/** @var Exception $class */
@@ -184,12 +179,12 @@ class Phockito {
 	 * @param string $mockedClass - The name of the class (or interface) to create a mock of
 	 * @return string The name of the mocker class
 	 */
-	protected static function build_test_double($partial, $mockedClass) {
+	protected static function build_test_double($partial, $mockedClass) : string {
 		// Bail if we were passed a classname that doesn't exist
 		if (!class_exists($mockedClass) && !interface_exists($mockedClass)) user_error("Can't mock non-existent class $mockedClass", E_USER_ERROR);
 
 		// How to get a reference to the Phockito class itself
-		$phockito = self::_has_namespaces() ? '\\Phockito' : 'Phockito';
+		$phockito = '\\Phockito';
 
 		// Reflect on the mocked class
 		$reflect = new ReflectionClass($mockedClass);
@@ -200,19 +195,13 @@ class Phockito {
 		$php = array();
 
 		// Get the namespace & the shortname of the mocked class
-		if (self::_has_namespaces()) {
-			$mockedNamespace = $reflect->getNamespaceName();
-			$mockedShortName = $reflect->getShortName();
-		}
-		else {
-			$mockedNamespace = '';
-			$mockedShortName = $mockedClass;
-		}
+		$mockedNamespace = $reflect->getNamespaceName();
+		$mockedShortName = $reflect->getShortName();
 
 		// Build the short name of the mocker class based on the mocked classes shortname
 		$mockerShortName = self::MOCK_PREFIX.$mockedShortName.($partial ? '_Spy' : '_Mock');
 		// And build the full class name of the mocker by prepending the namespace if appropriate
-		$mockerClass = (self::_has_namespaces() ? $mockedNamespace.'\\' : '') . $mockerShortName;
+		$mockerClass = $mockedNamespace . '\\' . $mockerShortName;
 
 		// If we've already built this test double, just return it
 		if (class_exists($mockerClass, false)) return $mockerClass;
@@ -235,8 +224,8 @@ class $mockerShortName $extends $mockedShortName $marker {
   public \$__phockito_instanceid;
 
   function __construct() {
-    \$this->__phockito_class = $mockedClassString;
-    \$this->__phockito_instanceid = $mockedClassString.':'.(++{$phockito}::\$_instanceid_counter);
+	\$this->__phockito_class = $mockedClassString;
+	\$this->__phockito_instanceid = $mockedClassString.':'.(++{$phockito}::\$_instanceid_counter);
   }
 EOT;
 
@@ -325,7 +314,7 @@ EOT;
 				if ($partial) {
 					$php[] = <<<EOT
   function __phockito_parent_construct( $defparams ){
-    parent::__construct( $callparams );
+	parent::__construct( $callparams );
   }
 EOT;
 				}
@@ -342,18 +331,19 @@ EOT;
 			// Build an overriding method that calls Phockito::__called, and never calls the parent
 			else {
 				$initArgsStatements = self::_create_array_from_func_args($method->getParameters());
+				$returnResultStatement = $returnType !== 'void' ? 'return $result;' : 'return;';
 				$php[] = <<<EOT
   $modifiers function $byRef {$method->name}( $defparams )$defReturn{
-    // Usually \$args = func_get_args();, but special case for references
-    $initArgsStatements
+	// Usually \$args = func_get_args();, but special case for references
+	$initArgsStatements
 
-    \$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-    \$instance = \$backtrace[0]['type'] == '::' ? ('::'.$mockedClassString) : \$this->__phockito_instanceid;
+	\$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+	\$instance = \$backtrace[0]['type'] == '::' ? ('::'.$mockedClassString) : \$this->__phockito_instanceid;
 
-    \$response = {$phockito}::__called($mockedClassString, \$instance, '{$method->name}', \$args);
+	\$response = {$phockito}::__called($mockedClassString, \$instance, '{$method->name}', \$args);
 
-    \$result = \$response ? {$phockito}::__perform_response(\$response, \$args) : ($failover);
-    return \$result;
+	\$result = \$response ? {$phockito}::__perform_response(\$response, \$args) : ($failover);
+	$returnResultStatement
   }
 EOT;
 			}
@@ -364,10 +354,10 @@ EOT;
 
 		$php[] = <<<EOT
   function __call(\$name, $has__call_type\$args) {
-    \$response = {$phockito}::__called($mockedClassString, \$this->__phockito_instanceid, \$name, \$args);
+	\$response = {$phockito}::__called($mockedClassString, \$this->__phockito_instanceid, \$name, \$args);
 
-    if (\$response) return {$phockito}::__perform_response(\$response, \$args);
-    else return $failover;
+	if (\$response) return {$phockito}::__perform_response(\$response, \$args);
+	else return $failover;
   }
 EOT;
 
@@ -380,11 +370,11 @@ EOT;
 
 		$php[] = <<<EOT
   function __toString() {
-    \$args = array();
-    \$response = {$phockito}::__called($mockedClassString, \$this->__phockito_instanceid, "__toString", \$args);
+	\$args = array();
+	\$response = {$phockito}::__called($mockedClassString, \$this->__phockito_instanceid, "__toString", \$args);
 
-    if (\$response) return {$phockito}::__perform_response(\$response, \$args);
-    else return $failover;
+	if (\$response) return {$phockito}::__perform_response(\$response, \$args);
+	else return $failover;
   }
 EOT;
 
@@ -401,40 +391,35 @@ EOT;
 	/**
 	 * @return string|null (e.g. 'SomeClass', 'string', (in php7.1) '?int', etc.)
 	 */
+	private static function _reflection_type_to_declaration(ReflectionType $type = null) {
+		if (!$type) {
+			return '';
+		}
+		return
+			($type->allowsNull() ? '?' : '') .
+			($type->isBuiltin() ? '' : '\\') .  // include absolute namespace for class names, so this will be able to mock namespaced classes
+			(string)$type;
+	}
+
+	/**
+	 * @return string|null (e.g. 'SomeClass', 'string', (in php7.1) '?int', etc.)
+	 */
 	private static function _get_return_type(ReflectionMethod $method) {
-		if (PHP_VERSION < 7) {
-			return null;
-		}
-		$type = $method->getReturnType();
-		if (!is_object($type)) {
-			return null;
-		}
-		return (string)$type;
+		return self::_reflection_type_to_declaration($method->getReturnType());
 	}
 
 	/**
 	 * @return string|null (e.g. 'SomeClass', 'string', (in php7.1) '?int', etc.)
 	 */
 	private static function _get_type_hint_of_parameter(ReflectionParameter $parameter) {
-		if ($parameter->isArray()) {
-			return 'array';
-		} else if ($parameterClass = $parameter->getClass()) {
-			return '\\'.$parameterClass->getName();
-		}
-		if (PHP_VERSION >= 7) {
-			$type = $parameter->getType();
-			if (!is_object($type)) {
-				return null;
-			}
-			return (string)$type;
-		}
-		return null;
+		return self::_reflection_type_to_declaration($parameter->getType());
 	}
+
 	/**
 	 * @param ReflectionParameter[] $parameters
 	 * @return string a command to initialize $args in an eval()ed mock.
 	 */
-	private static function _create_array_from_func_args(array $parameters) {
+	private static function _create_array_from_func_args(array $parameters) : string {
 		$hasReferences = false;
 		foreach ($parameters as $param) {
 			if ($param->isPassedByReference()) {
@@ -456,10 +441,10 @@ EOT;
 			}
 		}
 		$contents .= <<<EOT
-    \$args = array_slice(\$args, 0, func_num_args());  // ignore default or variadic params
-    for (\$__i = count(\$args); \$__i < func_num_args(); \$__i++) {
-      \$args[] = func_get_arg(\$__i);
-    }
+	\$args = array_slice(\$args, 0, func_num_args());  // ignore default or variadic params
+	for (\$__i = count(\$args); \$__i < func_num_args(); \$__i++) {
+	  \$args[] = func_get_arg(\$__i);
+	}
 EOT;
 		return $contents;
 	}
@@ -468,11 +453,10 @@ EOT;
 	 * Given a class name as a string, return a new class name as a string which acts as a mock
 	 * of the passed class name. Probably not useful by itself until we start supporting static method stubbing
 	 *
-	 * @static
 	 * @param string $class - The class to mock
 	 * @return string - The class that acts as a Phockito mock of the passed class
 	 */
-	static function mock_class($class) {
+	static function mock_class(string $class) : string {
 		$mockClass = self::build_test_double(false, $class);
 
 		// If we've been given a type registrar, call it (we need to do this even if class exists, since PHPUnit resets globals, possibly de-registering between tests)
@@ -485,23 +469,26 @@ EOT;
 	/**
 	 * Given a class name as a string, return a new instance which acts as a mock of that class
 	 *
-	 * @static
 	 * @param string $class - The class to mock
 	 * @return Object - A mock of that class
 	 */
-	static function mock_instance($class) {
+	static function mock_instance(string $class) {
 		$mockClass = self::mock_class($class);
 		return new $mockClass();
 	}
 
 	/**
 	 * Aternative name for mock_instance
+	 * @return object - A mock of that class
 	 */
-	static function mock($class) {
+	static function mock(string $class) {
 		return self::mock_instance($class);
 	}
 
-	static function spy_class($class) {
+	/**
+	 * @return object - A mock of that class
+	 */
+	static function spy_class(string $class) {
 		$spyClass = self::build_test_double(true, $class);
 
 		// If we've been given a type registrar, call it (we need to do this even if class exists, since PHPUnit resets globals, possibly de-registering between tests)
@@ -513,14 +500,13 @@ EOT;
 
 	const DONT_CALL_CONSTRUCTOR = '__phockito_dont_call_constructor';
 
-	static function spy_instance($class /*, $constructor_arg_1, ... */) {
+	/**
+	 * @return object - A mock of that class
+	 */
+	static function spy_instance(string $class, ...$constructor_args) {
 		$spyClass = self::spy_class($class);
 
 		$res = new $spyClass();
-
-		// Find the constructor args
-		$constructor_args = func_get_args();
-		array_shift($constructor_args);
 
 		// Call the constructor (maybe)
 		if (count($constructor_args) != 1 || $constructor_args[0] !== self::DONT_CALL_CONSTRUCTOR) {
@@ -529,7 +515,7 @@ EOT;
 				if ($constructor_args) user_error("Tried to create spy of $class with constructor args, but that $class doesn't have a constructor defined", E_USER_ERROR);
 			}
 			else {
-				call_user_func_array($constructor, $constructor_args);
+				$res->__phockito_parent_construct(...$constructor_args);
 			}
 		}
 
@@ -537,9 +523,11 @@ EOT;
 		return $res;
 	}
 
-	static function spy() {
-		$args = func_get_args();
-		return call_user_func_array(array(__CLASS__, 'spy_instance'), $args);
+	/**
+	 * @return object - A mock of that class
+	 */
+	static function spy(...$args) {
+		return static::spy_instance(...$args);
 	}
 
 	/**
@@ -553,6 +541,10 @@ EOT;
 			return new Phockito_WhenBuilder($arg->__phockito_instanceid);
 		}
 		else {
+			if (count(self::$_call_list) === 0) {
+				$type = is_object($arg) ? get_class($arg) : gettype($arg);
+				throw new InvalidArgumentException("No recent calls to Phockito mocks to pass to when. Probably called Phockito::when(\$mock->foo()), but \$mock is from a different mocking framework. Argument to Phockito::when was of type " . $type);
+			}
 			$method = array_shift(self::$_call_list);
 			return new Phockito_WhenBuilder($method['instance'], $method['method'], $method['args']);
 		}
@@ -562,9 +554,8 @@ EOT;
 	 * Verify builder. Takes a mock instance and an optional number of times to verify against. Returns a
 	 * DSL object that catches the method to verify
 	 *
-	 * @static
 	 * @param Phockito_Mock $mock - The mock instance to verify
-	 * @param string $times - The number of times the method should be called, either a number, or a number followed by "+"
+	 * @param int|string $times - The number of times the method should be called, either a number, or a number followed by "+"
 	 * @return Phockito_VerifyBuilder
 	 */
 	static function verify($mock, $times = 1) {
@@ -573,7 +564,6 @@ EOT;
 
 	/**
 	 * Reset a mock instance. Forget all calls and stubbed responses for a given instance
-	 * @static
 	 * @param Phockito_Mock $mock - The mock instance to reset
 	 */
 	static function reset($mock, $method = null) {
@@ -626,9 +616,11 @@ interface Phockito_MockMarker {
  */
 class Phockito_WhenBuilder {
 
+	// instance id
 	protected $instance;
 	protected $method;
 	protected $i;
+	protected $class;
 
 	protected $lastAction = null;
 
@@ -649,9 +641,92 @@ class Phockito_WhenBuilder {
 		);
 	}
 
-	function __construct($instance, $method = null, $args = null) {
+	public function __construct(string $instance, string $method = null, array $args = null) {
 		$this->instance = $instance;
+		$this->class = explode(':', $instance)[0];  // ClassName:0
 		if ($method) $this->__phockito_setMethod($method, $args);
+	}
+
+	// Redundant stubs for IDE/static analysis tools.
+	// Note that depending on context, Phockito_WhenBuilder->return may actually be stubbing the mock method of an object called 'return'
+
+	/**
+	 * @param mixed $value
+	 * @return self
+	 */
+	public function thenReturn($value) {
+		return $this->__call('return', func_get_args());
+	}
+
+	/**
+	 * @param callable $value - Custom callable to invoke on params to get the return value/throw.
+	 * @return self
+	 */
+	public function callback($value) {
+		$this->__call('callback', func_get_args());
+		return $this;
+	}
+
+	/**
+	 * Stubs for api documentation
+	 * @param callable $value - Custom callable to invoke on params to get the return value/throw.
+	 * @return self
+	 */
+	public function thenCallback($value) {
+		$this->__call('callback', func_get_args());
+		return $this;
+	}
+
+	/**
+	 * Stubs for api documentation
+	 * @param Exception $value
+	 * @return self
+	 */
+	public function throw($value) {
+		$this->__call('throw', func_get_args());
+		return $this;
+	}
+
+	/**
+	 * Stubs for api documentation
+	 * @param Exception $value
+	 * @return self
+	 */
+	public function thenThrow($value) {
+		$this->__call('throw', func_get_args());
+		return $this;
+	}
+
+	// End of stub methods.
+
+
+	/**
+	 * Checks that the $returnValue of Phockito::when($x)->foo(matcher)->return($returnValue) would not result in a TypeError
+	 * @throws InvalidArgumentException if it would be a TypeError in some special cases
+	 */
+	private function __phockito_checkReturnCompatibility(array $args) {
+		if (method_exists($this->class, $this->method)) {
+			$method = new ReflectionMethod($this->class, $this->method);
+			$returnType = $method->getReturnType();
+			$returnTypeString = (string)$returnType;
+			if ($returnTypeString === '') {
+				return;  // can be anything
+			}
+			$arg = $args[0] ?? null;
+			if ($returnTypeString === 'void') {
+				if ($arg !== null) {
+					throw new InvalidArgumentException(sprintf("The mocked return value for void method %s->%s must be null", $this->class, $this->method));
+				}
+				return;
+			}
+			// TODO: other type conversion checks
+			if ($arg === null) {
+				if (!$returnType->allowsNull()) {
+					throw new InvalidArgumentException(sprintf("The mocked return value for method %s->%s was null, but the return type must be %s", $this->class, $this->method, $returnTypeString));
+				}
+			}
+		}
+
 	}
 
 	/**
@@ -660,12 +735,14 @@ class Phockito_WhenBuilder {
 	 * To be as flexible as possible, we accept _any_ method with "return" in it as a return response, and anything with
 	 * throw in it as a throw response.
 	 */
-	function __call($called, $args) {
+	function __call($called, array $args) {
 		if (!$this->method) {
 			$this->__phockito_setMethod($called, $args);
 		}
 		else {
-			if (count($args) !== 1) user_error("$called requires exactly one argument", E_USER_ERROR);
+			if (count($args) !== 1) {
+				user_error("$called requires exactly one argument", E_USER_ERROR);
+			}
 			$value = $args[0]; $action = null;
 
 			if (preg_match('/return/i', $called)) $action = 'return';
@@ -686,6 +763,9 @@ class Phockito_WhenBuilder {
 				E_USER_ERROR
 			);
 
+			if ($action === 'return') {
+				$this->__phockito_checkReturnCompatibility($args);
+			}
 			Phockito::$_responses[$this->instance][$this->method][$this->i]['steps'][] = array(
 				'action' => $action,
 				'value' => $value
@@ -726,6 +806,7 @@ class Phockito_VerifyBuilder {
 	function __call($called, $args) {
 		$count = 0;
 
+		// TODO: SplObjectStorage to speed up large number of assertions? Or use spl_object_hash() and method()?
 		foreach (Phockito::$_call_list as $call) {
 			if ($call['instance'] == $this->instance && $call['method'] == $called && Phockito::_arguments_match($this->class, $called, $args, $call['args'])) {
 				$count++;
@@ -752,7 +833,7 @@ class Phockito_VerifyBuilder {
 		}
 
 		$exceptionClass = self::$exception_class;
+
 		throw new $exceptionClass($message);
 	}
 }
-
