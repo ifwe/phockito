@@ -15,6 +15,7 @@ spl_autoload_register(function ($class) {
 class PhockitoTest_MockMe {
 	function Foo() { throw new Exception('Base method Foo was called'); }
 	function Bar() { throw new Exception('Base method Bar was called'); }
+	function MultipleArgs(array $x) { throw new Exception('Base method Foo was called'); }
 }
 
 /** Classes with different types of hierarchy */
@@ -186,7 +187,7 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 
 	function testNoSpecForOptionalArgumentMatchesDefault() {
 		$mock = Phockito::mock('PhockitoTest_FooHasIntegerDefaultArgument');
-		
+
 		Phockito::when($mock->Foo())->return(1);
 		$this->assertEquals($mock->Foo(), 1);
 		$this->assertEquals($mock->Foo(1), 1);
@@ -329,6 +330,37 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($obj, $res);
 	}
 
+	/**
+	 * Verify that the error message clearly distinguishes between integers, strings, and floats.
+	 * Upstream phockito uses print_r(), which didn't.
+	 */
+	function testCanEmitVerificationWarning() {
+		$mock = Phockito::mock('PhockitoTest_MockMe');
+		$mock->Foo(['foo' => 2]);
+		try {
+			Phockito::verify($mock)->Foo(['foo' => '2']);
+			$this->fail('should throw');
+		} catch (PhockitoTest_VerificationFailure $e) {
+			$actualMessage = $e->getMessage();
+			$expectedMessage = <<<EOT
+Failed asserting that method Foo was called 1 times - actually called 0 times.
+Wanted call:
+Array &0 (
+	0 => Array &1 (
+		'foo' => '2'
+	)
+)Calls:
+Array &0 (
+	0 => Array &1 (
+		'foo' => 2
+	)
+)
+EOT;
+			$this->assertSame($expectedMessage, $actualMessage, 'Should use SebastianBergmann\Exporter to print a clear description of the error');
+		}
+	}
+
+
 	/** Test validating **/
 
 	/**   Against 0 */
@@ -361,7 +393,7 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 		Phockito::verify($mock)->Foo();
 	}
 
-	/** @expectedException PhockitoTest_VerificationFailure 
+	/** @expectedException PhockitoTest_VerificationFailure
 	 */
 	function testTwoCallsCorrectlyFailsVerificationAgainst1() {
 		$mock = Phockito::mock('PhockitoTest_MockMe');

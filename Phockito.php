@@ -1,4 +1,5 @@
 <?php
+use SebastianBergmann\Exporter\Exporter;
 
 /**
  * Phockito - Mockito for PHP
@@ -8,8 +9,6 @@
  * (C) 2011 Hamish Friedlander / SilverStripe. Distributable under the same license as SilverStripe.
  *
  * Patched for php 7.0 and php 7.1 compatibility. Incompatible with php 5.
- *
- * TODO: Patch to use SebastianBergmann\Exporter instead - print_r() will print `"2"` and `2` the same way, which is inconvenient.
  *
  * Example usage:
  *
@@ -819,16 +818,17 @@ class Phockito_VerifyBuilder {
 		else {
 			if ($count == $this->times) return;
 		}
+		$exporter = new Exporter();
 
 		$message  = "Failed asserting that method $called was called {$this->times} times - actually called $count times.\n";
 		$message .= "Wanted call:\n";
-		$message .= print_r($args, true);
+		$message .= $exporter->export($args);
 
 		$message .= "Calls:\n";
 
 		foreach (Phockito::$_call_list as $call) {
 			if ($call['instance'] == $this->instance && $call['method'] == $called) {
-				$message .= print_r($call['args'], true);
+				$message .= $exporter->export($call['args']);
 			}
 		}
 
