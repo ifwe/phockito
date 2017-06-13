@@ -346,14 +346,14 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 Failed asserting that method Foo was called 1 times - actually called 0 times.
 Wanted call:
 Array &0 (
-	0 => Array &1 (
-		'foo' => '2'
-	)
+    0 => Array &1 (
+        'foo' => '2'
+    )
 )Calls:
 Array &0 (
-	0 => Array &1 (
-		'foo' => 2
-	)
+    0 => Array &1 (
+        'foo' => 2
+    )
 )
 EOT;
 			$this->assertSame($expectedMessage, $actualMessage, 'Should use SebastianBergmann\Exporter to print a clear description of the error');

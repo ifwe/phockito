@@ -37,7 +37,6 @@ class Hamcrest_Traversable_IsEmptyTraversableTest
     $this->assertDescription('an empty traversable', emptyTraversable());
   }
 
-
   public function testNonEmptyDoesNotMatchNull()
   {
     $this->assertDoesNotMatch(nonEmptyTraversable(), null,

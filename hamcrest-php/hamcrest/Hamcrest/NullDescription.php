@@ -37,7 +37,12 @@ class Hamcrest_NullDescription implements Hamcrest_Description
   {
     return $this;
   }
-  
+
+  public function appendAssociativeArray($start, $separator, $entryKeyValueSeparator, $end, $values)
+  {
+    return $this;
+  }
+
   public function __toString()
   {
     return '';

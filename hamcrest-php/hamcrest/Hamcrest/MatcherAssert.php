@@ -97,7 +97,6 @@ class Hamcrest_MatcherAssert
     self::$_count = 0;
   }
 
-
   /**
    * Performs the actual assertion logic.
    *

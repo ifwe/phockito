@@ -70,7 +70,8 @@ class Hamcrest_Util
     {
       if (!($item instanceof Hamcrest_Matcher))
       {
-        $item = Hamcrest_Core_IsEqual::equalTo($item);
+        // Enable strict matching, to avoid confusing between int and string (e.g. `"2"` and `2`)
+        $item = Hamcrest_Core_IsIdentical::identicalTo($item);
       }
     }
 

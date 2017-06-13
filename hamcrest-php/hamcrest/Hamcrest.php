@@ -43,7 +43,7 @@ function anArray(/* args... */)
 
 /**
  * Evaluates to true if any item in an array satisfies the given matcher.
- * 
+ *
  * @param mixed $item as a {@link Hamcrest_Matcher} or a value.
  */
 function hasItemInArray($item)
@@ -54,7 +54,7 @@ function hasItemInArray($item)
 
 /**
  * Evaluates to true if any item in an array satisfies the given matcher.
- * 
+ *
  * @param mixed $item as a {@link Hamcrest_Matcher} or a value.
  */
 function hasValue($item)
@@ -66,31 +66,38 @@ function hasValue($item)
 /**
  * An array with elements that match the given matchers.
  */
-function arrayContainingInAnyOrder(/* args... */)
+function arrayContainingInAnyOrder(...$args)
 {
   require_once 'Hamcrest/Array/IsArrayContainingInAnyOrder.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Array_IsArrayContainingInAnyOrder', 'arrayContainingInAnyOrder'), $args);
+  return Hamcrest_Array_IsArrayContainingInAnyOrder::arrayContainingInAnyOrder(...$args);
 }
 
 /**
  * An array with elements that match the given matchers.
  */
-function containsInAnyOrder(/* args... */)
+function associativeArrayContainingSameItemsInAnyOrder(...$args)
+{
+  require_once 'Hamcrest/Array/IsAssociativeArrayContainingSameItemsInAnyOrder.php';
+  $args = func_get_args();
+  return Hamcrest_Array_IsAssociativeArrayContainingSameItemsInAnyOrder::associativeArrayContainingSameItemsInAnyOrder(...$args);
+}
+
+/**
+ * An array with elements that match the given matchers.
+ */
+function containsInAnyOrder(...$args)
 {
   require_once 'Hamcrest/Array/IsArrayContainingInAnyOrder.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Array_IsArrayContainingInAnyOrder', 'arrayContainingInAnyOrder'), $args);
+  return Hamcrest_Array_IsArrayContainingInAnyOrder::arrayContainingInAnyOrder($args);
 }
 
 /**
  * An array with elements that match the given matchers in the same order.
  */
-function arrayContaining(/* args... */)
+function arrayContaining(...$args)
 {
   require_once 'Hamcrest/Array/IsArrayContainingInOrder.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Array_IsArrayContainingInOrder', 'arrayContaining'), $args);
+  return Hamcrest_Array_IsArrayContainingInOrder::arrayContaining($args);
 }
 
 /**
@@ -105,7 +112,7 @@ function contains(/* args... */)
 
 /**
  * Evaluates to true if any key in an array matches the given matcher.
- * 
+ *
  * @param mixed $key as a {@link Hamcrest_Matcher} or a value.
  */
 function hasKeyInArray($key)
@@ -116,7 +123,7 @@ function hasKeyInArray($key)
 
 /**
  * Evaluates to true if any key in an array matches the given matcher.
- * 
+ *
  * @param mixed $key as a {@link Hamcrest_Matcher} or a value.
  */
 function hasKey($key)
@@ -145,7 +152,7 @@ function hasEntry($key, $value)
 
 /**
  * Does array size satisfy a given matcher?
- * 
+ *
  * @param int $size as a {@link Hamcrest_Matcher} or a value.
  */
 function arrayWithSize($size)
@@ -268,7 +275,7 @@ function describedAs(/* args... */)
 /**
  * @param Hamcrest_Matcher $itemMatcher
  *   A matcher to apply to every element in an array.
- * 
+ *
  * @return Hamcrest_Core_Every
  *   Evaluates to TRUE for a collection in which every item matches $itemMatcher
  */
@@ -290,7 +297,7 @@ function hasToString($matcher)
 /**
  * Decorates another Matcher, retaining the behavior but allowing tests
  * to be slightly more expressive.
- * 
+ *
  * For example:  assertThat($cheese, equalTo($smelly))
  *          vs.  assertThat($cheese, is(equalTo($smelly)))
  */
@@ -302,7 +309,7 @@ function is($value)
 
 /**
  * This matcher always evaluates to true.
- * 
+ *
  * @param string $description A meaningful string used when describing itself.
  */
 function anything($description = 'ANYTHING')
@@ -313,7 +320,7 @@ function anything($description = 'ANYTHING')
 
 /**
  * Test if the value is an array containing this matcher.
- * 
+ *
  * Example:
  * <pre>
  * assertThat(array('a', 'b'), hasItem(equalTo('b')));
@@ -331,7 +338,7 @@ function hasItem(/* args... */)
 /**
  * Test if the value is an array containing elements that match all of these
  * matchers.
- * 
+ *
  * Example:
  * <pre>
  * assertThat(array('a', 'b', 'c'), hasItems(equalTo('a'), equalTo('b')));
@@ -416,7 +423,7 @@ function notNullValue()
 
 /**
  * Creates a new instance of IsSame.
- * 
+ *
  * @param mixed $object
  *   The predicate evaluates to true only when the argument is
  *   this object.
