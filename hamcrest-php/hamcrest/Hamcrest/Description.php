@@ -68,5 +68,19 @@ interface Hamcrest_Description
    * @return Hamcrest_Description
    */
   public function appendList($start, $separator, $end, $values);
+
+  /**
+   * Appends an associative array of {@link Hamcrest_SelfDescribing} objects to the
+   * description.
+   *
+   * @param string $start
+   * @param string $separator
+   * @param string $end
+   * @param array|IteratorAggregate|Iterator $values
+   *   must be instances of {@link Hamcrest_SelfDescribing}
+   *
+   * @return Hamcrest_Description
+   */
+  public function appendAssociativeArray($start, $separator, $entryKeyValueSeparator, $end, $values);
   
 }

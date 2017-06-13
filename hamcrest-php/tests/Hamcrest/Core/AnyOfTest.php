@@ -45,7 +45,6 @@ class Hamcrest_Core_AnyOfTest extends Hamcrest_AbstractMatcherTest
     );
   }
 
-
   public function testNoneOfEvaluatesToTheLogicalDisjunctionOfTwoOtherMatchers()
   {
     assertThat('good', not(noneOf('bad', 'good')));

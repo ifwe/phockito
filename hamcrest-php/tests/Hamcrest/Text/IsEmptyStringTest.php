@@ -45,7 +45,6 @@ class Hamcrest_Text_IsEmptyStringTest extends Hamcrest_AbstractMatcherTest
     $this->assertDescription('an empty string', emptyString());
   }
 
-
   public function testEmptyOrNullMatchesNull()
   {
     $this->assertMatches(nullOrEmptyString(), null, 'null');
@@ -65,7 +64,6 @@ class Hamcrest_Text_IsEmptyStringTest extends Hamcrest_AbstractMatcherTest
   {
     $this->assertDescription('(null or an empty string)', nullOrEmptyString());
   }
-
 
   public function testNonEmptyDoesNotMatchNull()
   {

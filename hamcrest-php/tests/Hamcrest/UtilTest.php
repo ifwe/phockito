@@ -20,7 +20,6 @@ class Hamcrest_UtilTest extends PHPUnit_Framework_TestCase
     $this->assertTrue($matcher->matches('foo'));
   }
 
-
   public function testCheckAllAreMatchersAcceptsMatchers()
   {
     Hamcrest_Util::checkAllAreMatchers(array(
@@ -39,7 +38,6 @@ class Hamcrest_UtilTest extends PHPUnit_Framework_TestCase
       'foo',
     ));
   }
-
 
   private function callAndAssertCreateMatcherArray($items)
   {
