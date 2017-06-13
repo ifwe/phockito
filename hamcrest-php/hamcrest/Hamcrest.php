@@ -22,23 +22,18 @@ require_once 'Hamcrest/MatcherAssert.php';
  * assertThat("some error", $a > $b);
  * </pre>
  */
-function assertThat()
+function assertThat(...$args)
 {
-  $args = func_get_args();
-  call_user_func_array(
-    array('Hamcrest_MatcherAssert', 'assertThat'),
-    $args
-  );
+  Hamcrest_MatcherAssert::assertThat(...$args);
 }
 
 /**
  * Evaluates to true only if each $matcher[$i] is satisfied by $array[$i].
  */
-function anArray(/* args... */)
+function anArray(...$args)
 {
   require_once 'Hamcrest/Array/IsArray.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Array_IsArray', 'anArray'), $args);
+  return Hamcrest_Array_IsArray::anArray(...$args);
 }
 
 /**
@@ -78,7 +73,6 @@ function arrayContainingInAnyOrder(...$args)
 function associativeArrayContainingSameItemsInAnyOrder(...$args)
 {
   require_once 'Hamcrest/Array/IsAssociativeArrayContainingSameItemsInAnyOrder.php';
-  $args = func_get_args();
   return Hamcrest_Array_IsAssociativeArrayContainingSameItemsInAnyOrder::associativeArrayContainingSameItemsInAnyOrder(...$args);
 }
 
@@ -88,7 +82,7 @@ function associativeArrayContainingSameItemsInAnyOrder(...$args)
 function containsInAnyOrder(...$args)
 {
   require_once 'Hamcrest/Array/IsArrayContainingInAnyOrder.php';
-  return Hamcrest_Array_IsArrayContainingInAnyOrder::arrayContainingInAnyOrder($args);
+  return Hamcrest_Array_IsArrayContainingInAnyOrder::arrayContainingInAnyOrder(...$args);
 }
 
 /**
@@ -97,17 +91,16 @@ function containsInAnyOrder(...$args)
 function arrayContaining(...$args)
 {
   require_once 'Hamcrest/Array/IsArrayContainingInOrder.php';
-  return Hamcrest_Array_IsArrayContainingInOrder::arrayContaining($args);
+  return Hamcrest_Array_IsArrayContainingInOrder::arrayContaining(...$args);
 }
 
 /**
  * An array with elements that match the given matchers in the same order.
  */
-function contains(/* args... */)
+function contains(...$args)
 {
   require_once 'Hamcrest/Array/IsArrayContainingInOrder.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Array_IsArrayContainingInOrder', 'arrayContaining'), $args);
+  return Hamcrest_Array_IsArrayContainingInOrder::arrayContaining(...$args);
 }
 
 /**
@@ -209,31 +202,28 @@ function traversableWithSize($size)
 /**
  * Evaluates to true only if ALL of the passed in matchers evaluate to true.
  */
-function allOf(/* args... */)
+function allOf(...$args)
 {
   require_once 'Hamcrest/Core/AllOf.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Core_AllOf', 'allOf'), $args);
+  return Hamcrest_Core_AllOf::allOf(...$args);
 }
 
 /**
  * Evaluates to true if ANY of the passed in matchers evaluate to true.
  */
-function anyOf(/* args... */)
+function anyOf(...$args)
 {
   require_once 'Hamcrest/Core/AnyOf.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Core_AnyOf', 'anyOf'), $args);
+  return Hamcrest_Core_AnyOf::anyOf(...$args);
 }
 
 /**
  * Evaluates to false if ANY of the passed in matchers evaluate to true.
  */
-function noneOf(/* args... */)
+function noneOf(...$args)
 {
   require_once 'Hamcrest/Core/AnyOf.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Core_AnyOf', 'noneOf'), $args);
+  return Hamcrest_Core_AnyOf::noneOf(...$args);
 }
 
 /**
@@ -265,11 +255,10 @@ function either(Hamcrest_Matcher $matcher)
 /**
  * Wraps an existing matcher and overrides the description when it fails.
  */
-function describedAs(/* args... */)
+function describedAs(...$args)
 {
   require_once 'Hamcrest/Core/DescribedAs.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Core_DescribedAs', 'describedAs'), $args);
+  return Hamcrest_Core_DescribedAs::describedAs(...$args);
 }
 
 /**
@@ -328,11 +317,10 @@ function anything($description = 'ANYTHING')
  * assertThat(array('a', 'b'), hasItem('b'));
  * </pre>
  */
-function hasItem(/* args... */)
+function hasItem(...$args)
 {
   require_once 'Hamcrest/Core/IsCollectionContaining.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Core_IsCollectionContaining', 'hasItem'), $args);
+  return Hamcrest_Core_IsCollectionContaining::hasItem(...$args);
 }
 
 /**
@@ -344,11 +332,10 @@ function hasItem(/* args... */)
  * assertThat(array('a', 'b', 'c'), hasItems(equalTo('a'), equalTo('b')));
  * </pre>
  */
-function hasItems(/* args... */)
+function hasItems(...$args)
 {
   require_once 'Hamcrest/Core/IsCollectionContaining.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Core_IsCollectionContaining', 'hasItems'), $args);
+  return Hamcrest_Core_IsCollectionContaining::hasItems(...$args);
 }
 
 /**
@@ -636,11 +623,10 @@ function containsStringIgnoringCase($substring)
 /**
  * Matches if value contains $substrings in a constrained order.
  */
-function stringContainsInOrder(/* args... */)
+function stringContainsInOrder(...$args)
 {
   require_once 'Hamcrest/Text/StringContainsInOrder.php';
-  $args = func_get_args();
-  return call_user_func_array(array('Hamcrest_Text_StringContainsInOrder', 'stringContainsInOrder'), $args);
+  return Hamcrest_Text_StringContainsInOrder::stringContainsInOrder(...$args);
 }
 
 /**
