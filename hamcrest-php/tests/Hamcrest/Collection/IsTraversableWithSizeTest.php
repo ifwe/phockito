@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 require_once 'Hamcrest/AbstractMatcherTest.php';
 require_once 'Hamcrest/Collection/IsTraversableWithSize.php';
 
@@ -12,17 +12,17 @@ class Hamcrest_Traversable_IsTraversableWithSizeTest
         equalTo(2)
     );
   }
-  
+
   public function testMatchesWhenSizeIsCorrect()
   {
-    $this->assertMatches(traversableWithSize(equalTo(3)), 
+    $this->assertMatches(traversableWithSize(equalTo(3)),
         new ArrayObject(array(1, 2, 3)), 'correct size'
     );
   }
 
   public function testDoesNotMatchWhenSizeIsIncorrect()
   {
-    $this->assertDoesNotMatch(traversableWithSize(equalTo(2)), 
+    $this->assertDoesNotMatch(traversableWithSize(equalTo(2)),
         new ArrayObject(array(1, 2, 3)), 'incorrect size'
     );
   }
@@ -40,12 +40,12 @@ class Hamcrest_Traversable_IsTraversableWithSizeTest
         new ArrayObject(array(1, 2, 3)), 'correct size'
     );
   }
-  
+
   public function testHasAReadableDescription()
   {
-    $this->assertDescription('a traversable with size <3>', 
+    $this->assertDescription('a traversable with size <3>',
         traversableWithSize(equalTo(3))
     );
   }
-  
+
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  Copyright (c) 2010 hamcrest.org
@@ -11,7 +11,7 @@ require_once 'Hamcrest/Core/IsTypeOf.php';
  */
 class Hamcrest_Type_IsObject extends Hamcrest_Core_IsTypeOf
 {
-  
+
   /**
    * Creates a new instance of IsObject
    */
@@ -19,7 +19,7 @@ class Hamcrest_Type_IsObject extends Hamcrest_Core_IsTypeOf
   {
     parent::__construct('object');
   }
-  
+
   /**
    * Is the value an object?
    *
@@ -29,5 +29,5 @@ class Hamcrest_Type_IsObject extends Hamcrest_Core_IsTypeOf
   {
     return new self;
   }
-  
+
 }

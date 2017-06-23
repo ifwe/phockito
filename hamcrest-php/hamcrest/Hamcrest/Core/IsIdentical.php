@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  Copyright (c) 2009 hamcrest.org
@@ -13,20 +13,20 @@ require_once 'Hamcrest/Description.php';
  */
 class Hamcrest_Core_IsIdentical extends Hamcrest_Core_IsSame
 {
-  
+
   private $_value;
-  
+
   public function __construct($value)
   {
     parent::__construct($value);
     $this->_value = $value;
   }
-  
+
   public function describeTo(Hamcrest_Description $description)
   {
     $description->appendValue($this->_value);
   }
-  
+
   /**
    * Tests of the value is identical to $value as tested by the "===" operator.
    *
@@ -36,5 +36,5 @@ class Hamcrest_Core_IsIdentical extends Hamcrest_Core_IsSame
   {
     return new self($value);
   }
-  
+
 }

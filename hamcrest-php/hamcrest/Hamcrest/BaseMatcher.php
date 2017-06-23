@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  Copyright (c) 2009 hamcrest.org
@@ -15,15 +15,15 @@ require_once 'Hamcrest/StringDescription.php';
  */
 abstract class Hamcrest_BaseMatcher implements Hamcrest_Matcher
 {
-  
+
   public function describeMismatch($item, Hamcrest_Description $description)
   {
     $description->appendText('was ')->appendValue($item);
   }
-  
+
   public function __toString()
   {
     return Hamcrest_StringDescription::toString($this);
   }
-  
+
 }

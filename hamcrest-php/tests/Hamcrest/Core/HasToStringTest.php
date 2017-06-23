@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 require_once 'Hamcrest/AbstractMatcherTest.php';
 require_once 'Hamcrest/Core/HasToString.php';
 
@@ -24,7 +24,7 @@ class Hamcrest_HasToString_BothForms
   {
     return 'php';
   }
-  
+
   public function toString()
   {
     return 'java';
@@ -33,12 +33,12 @@ class Hamcrest_HasToString_BothForms
 
 class Hamcrest_Core_HasToStringTest extends Hamcrest_AbstractMatcherTest
 {
-  
+
   protected function createMatcher()
   {
     return Hamcrest_Core_HasToString::hasToString('foo');
   }
-  
+
   public function testMatchesWhenToStringMatches()
   {
     $this->assertMatches(hasToString(equalTo('php')),
@@ -55,7 +55,7 @@ class Hamcrest_Core_HasToStringTest extends Hamcrest_AbstractMatcherTest
         new Hamcrest_HasToString_BothForms(), 'correct toString'
     );
   }
-  
+
   public function testDoesNotMatchWhenToStringDoesNotMatch()
   {
     $this->assertDoesNotMatch(hasToString(equalTo('mismatch')),
@@ -75,19 +75,19 @@ class Hamcrest_Core_HasToStringTest extends Hamcrest_AbstractMatcherTest
       'should not match null'
     );
   }
-  
+
   public function testProvidesConvenientShortcutForTraversableWithSizeEqualTo()
   {
     $this->assertMatches(hasToString(equalTo('php')),
         new Hamcrest_HasToString_PhpForm(), 'correct __toString'
     );
   }
-  
+
   public function testHasAReadableDescription()
   {
-    $this->assertDescription('an object with toString() "php"', 
+    $this->assertDescription('an object with toString() "php"',
         hasToString(equalTo('php'))
     );
   }
-  
+
 }

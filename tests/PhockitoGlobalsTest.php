@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 // Include Phockito
 require_once(dirname(dirname(__FILE__)) . '/Phockito_Globals.php');
@@ -35,7 +35,7 @@ class PhockitoGlobalsTest extends PHPUnit_Framework_TestCase {
 
 	function testCanVerify() {
 		$mock = mock('PhockitoGlobalsTest_MockMe');
-		
+
 		$mock->Foo();
 		verify($mock)->Foo();
 	}

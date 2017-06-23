@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  Copyright (c) 2009 hamcrest.org
@@ -14,57 +14,57 @@ require_once 'Hamcrest/SelfDescribing.php';
  */
 interface Hamcrest_Description
 {
-  
+
   /**
    * Appends some plain text to the description.
-   * 
+   *
    * @param string $text
-   * 
+   *
    * @return Hamcrest_Description
    */
   public function appendText($text);
-  
+
   /**
    * Appends the description of a {@link Hamcrest_SelfDescribing} value to
    * this description.
-   * 
+   *
    * @param Hamcrest_SelfDescribing $value
-   * 
+   *
    * @return Hamcrest_Description
    */
   public function appendDescriptionOf(Hamcrest_SelfDescribing $value);
-  
+
   /**
    * Appends an arbitary value to the description.
-   * 
+   *
    * @param mixed $value
-   * 
+   *
    * @return Hamcrest_SelfDescribing
    */
   public function appendValue($value);
-  
+
   /**
    * Appends a list of values to the description.
-   * 
+   *
    * @param string $start
    * @param string $separator
    * @param string $end
    * @param array|IteratorAggregate|Iterator $values
-   * 
+   *
    * @return Hamcrest_Description
    */
   public function appendValueList($start, $separator, $end, $values);
-  
+
   /**
    * Appends a list of {@link Hamcrest_SelfDescribing} objects to the
    * description.
-   * 
+   *
    * @param string $start
    * @param string $separator
    * @param string $end
    * @param array|IteratorAggregate|Iterator $values
    *   must be instances of {@link Hamcrest_SelfDescribing}
-   * 
+   *
    * @return Hamcrest_Description
    */
   public function appendList($start, $separator, $end, $values);
@@ -82,5 +82,5 @@ interface Hamcrest_Description
    * @return Hamcrest_Description
    */
   public function appendAssociativeArray($start, $separator, $entryKeyValueSeparator, $end, $values);
-  
+
 }

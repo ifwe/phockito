@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 // Include Phockito
 require_once(dirname(dirname(__FILE__)) . '/Phockito.php');

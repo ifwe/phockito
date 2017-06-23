@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  Copyright (c) 2009 hamcrest.org
@@ -31,17 +31,17 @@ class Hamcrest_Text_StringContains extends Hamcrest_Text_SubstringMatcher
   {
     return new self($substring);
   }
-  
+
   // -- Protected Methods
-  
+
   protected function evalSubstringOf($item)
   {
     return (false !== strpos((string) $item, $this->_substring));
   }
-  
+
   protected function relationship()
   {
     return 'containing';
   }
-  
+
 }

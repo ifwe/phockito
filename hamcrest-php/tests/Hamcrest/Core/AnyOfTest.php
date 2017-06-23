@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 require_once 'Hamcrest/AbstractMatcherTest.php';
 require_once 'Hamcrest/Core/AnyOf.php';
 require_once 'Hamcrest/Core/SampleBaseClass.php';

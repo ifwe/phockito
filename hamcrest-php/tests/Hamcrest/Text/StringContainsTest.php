@@ -1,24 +1,24 @@
-<?php
+<?php declare(strict_types=1);
 require_once 'Hamcrest/AbstractMatcherTest.php';
 require_once 'Hamcrest/Text/StringContains.php';
 
 class Hamcrest_Text_StringContainsTest extends Hamcrest_AbstractMatcherTest
 {
-  
+
   const EXCERPT = 'EXCERPT';
-  
+
   private $_stringContains;
-  
+
   public function setUp()
   {
     $this->_stringContains = Hamcrest_Text_StringContains::containsString(self::EXCERPT);
   }
-  
+
   protected function createMatcher()
   {
     return $this->_stringContains;
   }
-  
+
   public function testEvaluatesToTrueIfArgumentContainsSubstring()
   {
     $this->assertTrue($this->_stringContains->matches(self::EXCERPT . 'END'),
@@ -33,7 +33,7 @@ class Hamcrest_Text_StringContainsTest extends Hamcrest_AbstractMatcherTest
     $this->assertTrue($this->_stringContains->matches(self::EXCERPT . self::EXCERPT),
       'should be true if excerpt is repeated'
     );
-    
+
     $this->assertFalse($this->_stringContains->matches('Something else'),
       'should not be true if excerpt is not in string'
     );
@@ -41,7 +41,7 @@ class Hamcrest_Text_StringContainsTest extends Hamcrest_AbstractMatcherTest
       'should not be true if part of excerpt is in string'
     );
   }
-  
+
   public function testEvaluatesToTrueIfArgumentIsEqualToSubstring()
   {
     $this->assertTrue($this->_stringContains->matches(self::EXCERPT),
@@ -65,11 +65,11 @@ class Hamcrest_Text_StringContainsTest extends Hamcrest_AbstractMatcherTest
       'should be true if excerpt is entire string ignoring case'
     );
   }
-  
+
   public function testHasAReadableDescription()
   {
     $this->assertDescription('a string containing "'
         . self::EXCERPT . '"', $this->_stringContains);
   }
-  
+
 }

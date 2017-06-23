@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 require_once 'Hamcrest/MatcherAssert.php';
 require_once 'Hamcrest/AssertionError.php';
 
@@ -193,12 +193,12 @@ class Hamcrest_MatcherAssertTest extends PHPUnit_Framework_TestCase
   {
     $expected = 'expected';
     $actual = 'actual';
-    
-    $expectedMessage = 
+
+    $expectedMessage =
       'identifier' . PHP_EOL .
       'Expected: "expected"' . PHP_EOL .
       '     but: was "actual"';
-    
+
     try
     {
       Hamcrest_MatcherAssert::assertThat('identifier', $actual, equalTo($expected));
@@ -236,5 +236,5 @@ class Hamcrest_MatcherAssertTest extends PHPUnit_Framework_TestCase
       self::assertEquals(0, Hamcrest_MatcherAssert::getCount(), 'assertion count');
     }
   }
-  
+
 }

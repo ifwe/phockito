@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 require_once 'Hamcrest/AbstractMatcherTest.php';
 require_once 'Hamcrest/FeatureMatcher.php';
 
@@ -33,25 +33,25 @@ class Hamcrest_ResultMatcher extends Hamcrest_FeatureMatcher
 
 class Hamcrest_FeatureMatcherTest extends Hamcrest_AbstractMatcherTest
 {
-  
+
   private $_resultMatcher;
-  
+
   public function setUp()
   {
     $this->_resultMatcher = $this->_resultMatcher();
   }
-  
+
   protected function createMatcher()
   {
     return $this->_resultMatcher();
   }
-  
+
   public function testMatchesPartOfAnObject()
   {
     $this->assertMatches($this->_resultMatcher, new Hamcrest_Thingy('bar'), 'feature');
     $this->assertDescription('Thingy with result "bar"', $this->_resultMatcher);
   }
-  
+
   public function testMismatchesPartOfAnObject()
   {
     $this->assertMismatchDescription(
@@ -59,17 +59,17 @@ class Hamcrest_FeatureMatcherTest extends Hamcrest_AbstractMatcherTest
       $this->_resultMatcher, new Hamcrest_Thingy('foo')
     );
   }
-  
+
   public function testDoesNotGenerateNoticesForNull()
   {
     $this->assertMismatchDescription('result was null', $this->_resultMatcher, null);
   }
-  
+
   // -- Creation Methods
-  
+
   private function _resultMatcher()
   {
     return new Hamcrest_ResultMatcher();
   }
-  
+
 }

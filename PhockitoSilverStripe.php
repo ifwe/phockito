@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 class PhockitoSilverStripe {
 
@@ -6,7 +6,7 @@ class PhockitoSilverStripe {
 
 	static function register_double($double, $of, $isDoubleOfInterface = false) {
 		$_all_classes = self::$_all_classes;
-		
+
 		global ${$_all_classes};
 		if (${$_all_classes} && is_array(${$_all_classes}) && !isset(${$_all_classes}['exists'][$double])) {
 

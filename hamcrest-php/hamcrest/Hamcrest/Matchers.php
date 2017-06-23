@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  Copyright (c) 2009-2010 hamcrest.org
@@ -26,7 +26,7 @@ class Hamcrest_Matchers
 
   /**
    * Evaluates to true if any item in an array satisfies the given matcher.
-   * 
+   *
    * @param mixed $item as a {@link Hamcrest_Matcher} or a value.
    */
   public static function hasItemInArray($item)
@@ -37,7 +37,7 @@ class Hamcrest_Matchers
 
   /**
    * Evaluates to true if any item in an array satisfies the given matcher.
-   * 
+   *
    * @param mixed $item as a {@link Hamcrest_Matcher} or a value.
    */
   public static function hasValue($item)
@@ -88,7 +88,7 @@ class Hamcrest_Matchers
 
   /**
    * Evaluates to true if any key in an array matches the given matcher.
-   * 
+   *
    * @param mixed $key as a {@link Hamcrest_Matcher} or a value.
    */
   public static function hasKeyInArray($key)
@@ -99,7 +99,7 @@ class Hamcrest_Matchers
 
   /**
    * Evaluates to true if any key in an array matches the given matcher.
-   * 
+   *
    * @param mixed $key as a {@link Hamcrest_Matcher} or a value.
    */
   public static function hasKey($key)
@@ -128,7 +128,7 @@ class Hamcrest_Matchers
 
   /**
    * Does array size satisfy a given matcher?
-   * 
+   *
    * @param int $size as a {@link Hamcrest_Matcher} or a value.
    */
   public static function arrayWithSize($size)
@@ -251,7 +251,7 @@ class Hamcrest_Matchers
   /**
    * @param Hamcrest_Matcher $itemMatcher
    *   A matcher to apply to every element in an array.
-   * 
+   *
    * @return Hamcrest_Core_Every
    *   Evaluates to TRUE for a collection in which every item matches $itemMatcher
    */
@@ -273,7 +273,7 @@ class Hamcrest_Matchers
   /**
    * Decorates another Matcher, retaining the behavior but allowing tests
    * to be slightly more expressive.
-   * 
+   *
    * For example:  assertThat($cheese, equalTo($smelly))
    *          vs.  assertThat($cheese, is(equalTo($smelly)))
    */
@@ -285,7 +285,7 @@ class Hamcrest_Matchers
 
   /**
    * This matcher always evaluates to true.
-   * 
+   *
    * @param string $description A meaningful string used when describing itself.
    */
   public static function anything($description = 'ANYTHING')
@@ -296,7 +296,7 @@ class Hamcrest_Matchers
 
   /**
    * Test if the value is an array containing this matcher.
-   * 
+   *
    * Example:
    * <pre>
    * assertThat(array('a', 'b'), hasItem(equalTo('b')));
@@ -314,7 +314,7 @@ class Hamcrest_Matchers
   /**
    * Test if the value is an array containing elements that match all of these
    * matchers.
-   * 
+   *
    * Example:
    * <pre>
    * assertThat(array('a', 'b', 'c'), hasItems(equalTo('a'), equalTo('b')));
@@ -399,7 +399,7 @@ class Hamcrest_Matchers
 
   /**
    * Creates a new instance of IsSame.
-   * 
+   *
    * @param mixed $object
    *   The predicate evaluates to true only when the argument is
    *   this object.

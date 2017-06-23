@@ -1,15 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 require_once 'Hamcrest/AbstractMatcherTest.php';
 require_once 'Hamcrest/Type/IsScalar.php';
 
 class Hamcrest_Type_IsScalarTest extends Hamcrest_AbstractMatcherTest
 {
-  
+
   protected function createMatcher()
   {
     return Hamcrest_Type_IsScalar::scalarValue();
   }
-  
+
   public function testEvaluatesToTrueIfArgumentMatchesType()
   {
     assertThat(true, scalarValue());
@@ -26,16 +26,16 @@ class Hamcrest_Type_IsScalarTest extends Hamcrest_AbstractMatcherTest
     assertThat(tmpfile(), not(scalarValue()));
     assertThat(new stdClass(), not(scalarValue()));
   }
-  
+
   public function testHasAReadableDescription()
   {
     $this->assertDescription('a scalar', scalarValue());
   }
-  
+
   public function testDecribesActualTypeInMismatchMessage()
   {
     $this->assertMismatchDescription('was null', scalarValue(), null);
     $this->assertMismatchDescription('was an array ["foo"]', scalarValue(), array('foo'));
   }
-  
+
 }

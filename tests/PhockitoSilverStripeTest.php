@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 require_once(dirname(dirname(__FILE__)) . '/Phockito.php');
 
@@ -33,10 +33,10 @@ class PhockitoSilverStripeTest extends PHPUnit_Framework_TestCase {
 
 	function setUp() {
 		self::$orig_type_registrar = Phockito::$type_registrar;
-		
+
 		require_once(dirname(dirname(__FILE__)) . '/PhockitoSilverStripe.php');
 		Phockito::$type_registrar = 'PhockitoSilverStripe';
-		
+
 		self::$orig_all_classes = PhockitoSilverStripe::$_all_classes;
 		PhockitoSilverStripe::$_all_classes = '_PSST_ALL_CLASSES';
 	}

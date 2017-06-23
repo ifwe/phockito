@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 // Include Phockito
 require_once(dirname(dirname(__FILE__)) . '/Phockito.php');
@@ -18,13 +18,13 @@ class PhockitoHamcrestTest extends PHPUnit_Framework_TestCase {
 
 	function testCanStubByType() {
 		$mock = Phockito::mock('PhockitoHamcrestTest_MockMe');
-		
+
 		Phockito::when($mock->Foo(intValue(), stringValue()))->return('int,string');
 		Phockito::when($mock->Foo(stringValue(), stringValue()))->return('string,string');
-		
-		$this->assertNull($mock->Foo(1, 1));		
+
+		$this->assertNull($mock->Foo(1, 1));
 		$this->assertEquals($mock->Foo(1, 'a'), 'int,string');
-		$this->assertNull($mock->Foo('a', 1));		
+		$this->assertNull($mock->Foo('a', 1));
 		$this->assertEquals($mock->Foo('a', 'a'), 'string,string');
 	}
 
@@ -33,7 +33,7 @@ class PhockitoHamcrestTest extends PHPUnit_Framework_TestCase {
 
 		$mock->Bar('Pow!');
 		$mock->Bar('Bam!');
-		
+
 		Phockito::verify($mock, 2)->Bar(stringValue());
 	}
 

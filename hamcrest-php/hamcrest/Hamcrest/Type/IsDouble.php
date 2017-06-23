@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  Copyright (c) 2010 hamcrest.org
@@ -13,7 +13,7 @@ require_once 'Hamcrest/Core/IsTypeOf.php';
  */
 class Hamcrest_Type_IsDouble extends Hamcrest_Core_IsTypeOf
 {
-  
+
   /**
    * Creates a new instance of IsDouble
    */
@@ -21,7 +21,7 @@ class Hamcrest_Type_IsDouble extends Hamcrest_Core_IsTypeOf
   {
     parent::__construct('double');
   }
-  
+
   /**
    * Is the value a float/double?
    *
@@ -31,5 +31,5 @@ class Hamcrest_Type_IsDouble extends Hamcrest_Core_IsTypeOf
   {
     return new self;
   }
-  
+
 }

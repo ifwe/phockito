@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  Copyright (c) 2009 hamcrest.org
@@ -12,24 +12,24 @@ require_once 'Hamcrest/Description.php';
  */
 class Hamcrest_Core_IsAnything extends Hamcrest_BaseMatcher
 {
-  
+
   private $_message;
-  
+
   public function __construct($message = 'ANYTHING')
   {
     $this->_message = $message;
   }
-  
+
   public function matches($item)
   {
     return true;
   }
-  
+
   public function describeTo(Hamcrest_Description $description)
   {
     $description->appendText($this->_message);
   }
-  
+
   /**
    * This matcher always evaluates to true.
    *
@@ -41,5 +41,5 @@ class Hamcrest_Core_IsAnything extends Hamcrest_BaseMatcher
   {
     return new self($description);
   }
-  
+
 }

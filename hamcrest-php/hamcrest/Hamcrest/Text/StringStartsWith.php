@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  Copyright (c) 2009 hamcrest.org
@@ -11,7 +11,7 @@ require_once 'Hamcrest/Text/SubstringMatcher.php';
  */
 class Hamcrest_Text_StringStartsWith extends Hamcrest_Text_SubstringMatcher
 {
-  
+
   public function __construct($substring)
   {
     parent::__construct($substring);
@@ -26,17 +26,17 @@ class Hamcrest_Text_StringStartsWith extends Hamcrest_Text_SubstringMatcher
   {
     return new self($substring);
   }
-  
+
   // -- Protected Methods
-  
+
   protected function evalSubstringOf($string)
   {
     return (substr($string, 0, strlen($this->_substring)) === $this->_substring);
   }
-  
+
   protected function relationship()
   {
     return 'starting with';
   }
-  
+
 }

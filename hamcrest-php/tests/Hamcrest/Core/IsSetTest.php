@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 require_once 'Hamcrest/AbstractMatcherTest.php';
 require_once 'Hamcrest/Core/IsSet.php';
 
@@ -13,7 +13,7 @@ class Hamcrest_Core_IsSetTest extends Hamcrest_AbstractMatcherTest
     self::$_classProperty = null;
     unset($this->_instanceProperty);
   }
-  
+
   protected function createMatcher()
   {
     return Hamcrest_Core_IsSet::set('property_name');
@@ -82,13 +82,13 @@ class Hamcrest_Core_IsSetTest extends Hamcrest_AbstractMatcherTest
   {
     assertThat($this, notSet('_instanceProperty'));
   }
-  
+
   public function testHasAReadableDescription()
   {
     $this->assertDescription('set property foo', set('foo'));
     $this->assertDescription('unset property bar', notSet('bar'));
   }
-  
+
   public function testDecribesPropertySettingInMismatchMessage()
   {
     $this->assertMismatchDescription('was not set', set('bar'),
@@ -106,5 +106,5 @@ class Hamcrest_Core_IsSetTest extends Hamcrest_AbstractMatcherTest
         $this
     );
   }
-  
+
 }

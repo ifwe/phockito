@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 use SebastianBergmann\Exporter\Exporter;
 
 /**
@@ -216,6 +216,7 @@ class Phockito {
 		$mockedClassString = "'".str_replace('\\', '\\\\', $mockedClass)."'";
 
 		// Add opening class stanza
+		$php[] = 'declare(strict_types=1);';
 		$php[] = <<<EOT
 $namespaceDeclaration
 class $mockerShortName $extends $mockedShortName $marker {
@@ -812,7 +813,7 @@ class Phockito_VerifyBuilder {
 			}
 		}
 
-		if (preg_match('/([0-9]+)\+/', $this->times, $match)) {
+		if (is_string($this->times) && preg_match('/([0-9]+)\+/', $this->times, $match)) {
 			if ($count >= (int)$match[1]) return;
 		}
 		else {

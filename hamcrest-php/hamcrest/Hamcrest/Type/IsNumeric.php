@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  Copyright (c) 2010 hamcrest.org
@@ -20,7 +20,7 @@ class Hamcrest_Type_IsNumeric extends Hamcrest_Core_IsTypeOf
   {
     return is_numeric($item);
   }
-  
+
   /**
    * Is the value a numeric?
    *
@@ -30,5 +30,5 @@ class Hamcrest_Type_IsNumeric extends Hamcrest_Core_IsTypeOf
   {
     return new self;
   }
-  
+
 }

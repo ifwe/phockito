@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 require_once 'Hamcrest/Util.php';
 require_once 'Hamcrest/Core/IsEqual.php';
 require_once 'Hamcrest/Text/MatchesPattern.php';

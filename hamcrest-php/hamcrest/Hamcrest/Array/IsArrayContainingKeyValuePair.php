@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 require_once 'Hamcrest/TypeSafeMatcher.php';
 require_once 'Hamcrest/Description.php';
