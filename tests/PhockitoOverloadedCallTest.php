@@ -6,7 +6,7 @@ class PhockitoOverloadedCallTest_OverloadedCall {
 	function __call($name, $args) { return $name; }
 }
 
-class PhockitoOverloadedCallTest extends PHPUnit_Framework_TestCase {
+class PhockitoOverloadedCallTest extends PHPUnit\Framework\TestCase {
 
 	function testMockingCall() {
 		$mock = Phockito::mock('PhockitoOverloadedCallTest_OverloadedCall');

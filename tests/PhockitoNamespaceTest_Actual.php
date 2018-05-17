@@ -54,7 +54,7 @@ namespace org\phockito\tests {
 
 namespace {
 
-	class PhockitoNamespaceTest extends PHPUnit_Framework_TestCase {
+	class PhockitoNamespaceTest extends PHPUnit\Framework\TestCase {
 
 		function testCanMockNamespacedClass() {
 			$mock = Phockito::mock('\org\phockito\tests\PhockitoNamespaceTest_MockMe');

@@ -55,7 +55,7 @@ class PhockitoTest_FooHasIntegerReturn { function Foo() : int { } }
 
 /** And the tests themselves */
 
-class PhockitoTest extends PHPUnit_Framework_TestCase {
+class PhockitoTest extends PHPUnit\Framework\TestCase {
 
 	static function setUpBeforeClass() {
 		Phockito_VerifyBuilder::$exception_class = 'PhockitoTest_VerificationFailure';
@@ -280,7 +280,7 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * The raised error will be wrapped in an exception by PHPUnit
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 */
 	function testCannotUseThenWithoutAPreviousAction() {
@@ -290,7 +290,7 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * The raised error will be wrapped in an exception by PHPUnit
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 */
 	function testUnknownStubbingActionThrowsAnError() {
@@ -300,7 +300,7 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * The raised error will be wrapped in an exception by PHPUnit
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 */
 	function testProvidingTooFewArgumentsToStubbingActionThrowsAnError() {
@@ -310,7 +310,7 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * The raised error will be wrapped in an exception by PHPUnit
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 */
 	function testProvidingTooManyArgumentsToStubbingActionThrowsAnError() {
@@ -483,7 +483,7 @@ EOT;
 	}
 
 	/**
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 */
 	function testCannotMockFinalClass() {

@@ -3,7 +3,7 @@
 // Include Phockito
 require_once(dirname(dirname(__FILE__)) . '/Phockito.php');
 
-class PhockitoBuiltinsTest extends PHPUnit_Framework_TestCase {
+class PhockitoBuiltinsTest extends PHPUnit\Framework\TestCase {
 
 	/** Test creation of mock class for builtins **/
 
