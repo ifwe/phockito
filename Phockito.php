@@ -707,25 +707,53 @@ class Phockito_WhenBuilder {
 		if (method_exists($this->class, $this->method)) {
 			$method = new ReflectionMethod($this->class, $this->method);
 			$returnType = $method->getReturnType();
+			// NOTE: $returnTypeString doesn't begin with `?` even if this is nullable.
 			$returnTypeString = (string)$returnType;
 			if ($returnTypeString === '') {
 				return;  // can be anything
 			}
 			$arg = $args[0] ?? null;
+
+			if ($returnType->allowsNull()) {
+				if ($arg === null) {
+					// Allows null for nullable return types
+					return;
+				}
+			}
+
 			if ($returnTypeString === 'void') {
 				if ($arg !== null) {
-					throw new InvalidArgumentException(sprintf("The mocked return value for void method %s->%s must be null", $this->class, $this->method));
+					throw new TypeError(sprintf("The mocked return value for void method %s->%s must be null", $this->class, $this->method));
 				}
 				return;
 			}
-			// TODO: other type conversion checks
 			if ($arg === null) {
-				if (!$returnType->allowsNull()) {
-					throw new InvalidArgumentException(sprintf("The mocked return value for method %s->%s was null, but the return type must be %s", $this->class, $this->method, $returnTypeString));
+				throw new TypeError(sprintf("The mocked return value for method %s->%s was null, but the return type must be %s", $this->class, $this->method, $returnTypeString));
+			}
+			// other type conversion checks
+			$arg_type = is_object($arg) ? get_class($arg) : gettype($arg);
+
+			if (!$returnType->isBuiltin()) {
+				// instanceof's right hand side can be a string
+				return $arg instanceof $returnTypeString;
+			}
+			$checkMap = [
+				// 'object' => 'is_object',  // php 7.2
+				'array'  => 'is_array',
+				'string' => 'is_string',
+				'int'	=> 'is_int',
+				'bool'   => 'is_bool',
+				'float'  => function($x) {
+					return is_float($x) || is_int($x);  // PHP lets int cast to float for param/return types without issue, even in strict mode.
+				},
+			];
+			$checkFunction = $checkMap[$returnTypeString] ?? null;
+			if ($checkFunction) {
+				if (!$checkFunction($arg)) {
+					throw new TypeError(sprintf("The mocked return value for method %s->%s was %s, but the return type must be %s", $this->class, $this->method, $arg_type, $returnTypeString));
 				}
 			}
 		}
-
 	}
 
 	/**

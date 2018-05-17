@@ -10,7 +10,7 @@ class PhockitoGlobalsTest_MockMe {
 
 /** And the tests themselves */
 
-class PhockitoGlobalsTest extends PHPUnit_Framework_TestCase {
+class PhockitoGlobalsTest extends PHPUnit\Framework\TestCase {
 
 	function testCanBuildMock() {
 		$mock = mock('PhockitoGlobalsTest_MockMe');

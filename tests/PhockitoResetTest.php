@@ -12,7 +12,7 @@ class PhockitoResetTest_MockMe {
 
 /** And the tests themselves */
 
-class PhockitoResetTest extends PHPUnit_Framework_TestCase {
+class PhockitoResetTest extends PHPUnit\Framework\TestCase {
 
 	function testCanResetStubbedResults() {
 		$mock = Phockito::mock('PhockitoResetTest_MockMe');

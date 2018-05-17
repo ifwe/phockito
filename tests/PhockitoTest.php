@@ -51,9 +51,11 @@ class PhockitoTest_FooReturnsByReference_Implements implements PhockitoTest_Mock
 class PhockitoTest_VerificationFailure extends Exception {}
 class PhockitoTest_StubResponse extends Exception {}
 
+class PhockitoTest_FooHasIntegerReturn { function Foo() : int { } }
+
 /** And the tests themselves */
 
-class PhockitoTest extends PHPUnit_Framework_TestCase {
+class PhockitoTest extends PHPUnit\Framework\TestCase {
 
 	static function setUpBeforeClass() {
 		Phockito_VerifyBuilder::$exception_class = 'PhockitoTest_VerificationFailure';
@@ -96,6 +98,32 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 		$mock = Phockito::mock('PhockitoTest_FooHasIntegerDefaultArgument');
 		$this->assertNull($mock->Foo());
 		$this->assertNull($mock->Foo(1));
+	}
+
+	function testCanCreateMockMethodWithIntegerReturnChecksType() {
+		$mock = Phockito::mock('PhockitoTest_FooHasIntegerReturn');
+		try {
+			Phockito::when($mock)->Foo(2)->return('x');
+			$this->fail('should throw');
+		} catch (TypeError $e) {
+			$this->assertSame('The mocked return value for method PhockitoTest_FooHasIntegerReturn->Foo was string, but the return type must be int', $e->getMessage());
+		}
+	}
+
+	function testCanCreateMockMethodWithIntegerReturnChecksNullType() {
+		$mock = Phockito::mock('PhockitoTest_FooHasIntegerReturn');
+		try {
+			Phockito::when($mock)->Foo(2)->return(null);
+			$this->fail('should throw');
+		} catch (TypeError $e) {
+			$this->assertSame('The mocked return value for method PhockitoTest_FooHasIntegerReturn->Foo was null, but the return type must be int', $e->getMessage());
+		}
+	}
+
+	function testCanCreateMockMethodWithIntegerReturnAcceptsValidType() {
+		$mock = Phockito::mock('PhockitoTest_FooHasIntegerReturn');
+		Phockito::when($mock)->Foo(2)->return(3);
+		$this->assertSame(3, $mock->Foo(2));
 	}
 
 	function testCanCreateMockMethodWithArrayDefaultArgument() {
@@ -252,7 +280,7 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * The raised error will be wrapped in an exception by PHPUnit
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 */
 	function testCannotUseThenWithoutAPreviousAction() {
@@ -262,7 +290,7 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * The raised error will be wrapped in an exception by PHPUnit
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 */
 	function testUnknownStubbingActionThrowsAnError() {
@@ -272,7 +300,7 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * The raised error will be wrapped in an exception by PHPUnit
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 */
 	function testProvidingTooFewArgumentsToStubbingActionThrowsAnError() {
@@ -282,7 +310,7 @@ class PhockitoTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * The raised error will be wrapped in an exception by PHPUnit
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 */
 	function testProvidingTooManyArgumentsToStubbingActionThrowsAnError() {
@@ -455,7 +483,7 @@ EOT;
 	}
 
 	/**
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 */
 	function testCannotMockFinalClass() {
