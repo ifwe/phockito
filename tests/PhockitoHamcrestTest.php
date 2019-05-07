@@ -12,7 +12,7 @@ class PhockitoHamcrestTest_MockMe {
 
 class PhockitoHamcrestTest_PassMe {}
 
-class PhockitoHamcrestTest extends PHPUnit\Framework\TestCase {
+class PhockitoHamcrestTest extends \PHPUnit\Framework\TestCase {
 
 	/** Test stubbing **/
 

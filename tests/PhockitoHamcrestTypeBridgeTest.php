@@ -23,7 +23,7 @@ class PhockitoHamcrestTypeBridgeTest_PassMe_MatcherMethods {
 	public function matches($item) { throw new Exception('Base method matches was called'); }
 }
 
-class PhockitoHamcrestTypeBridgeTest extends PHPUnit\Framework\TestCase {
+class PhockitoHamcrestTypeBridgeTest extends \PHPUnit\Framework\TestCase {
     function testCanStubUsingMatchersForTypeHintedObjectArguments() {
         $mock = Phockito::mock('PhockitoHamcrestTypeBridgeTest_MockMe');
 
@@ -47,7 +47,7 @@ class PhockitoHamcrestTypeBridgeTest extends PHPUnit\Framework\TestCase {
 	}
 
 	/**
-	 * @expectedException PHPUnit\Framework\Error\Error
+	 * @expectedException \PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 * @expectedExceptionMessage Can't mock non-existent class NotAClass
 	 */
@@ -61,7 +61,7 @@ class PhockitoHamcrestTypeBridgeTest extends PHPUnit\Framework\TestCase {
 	}
 
 	/**
-	 * @expectedException PHPUnit\Framework\Error\Error
+	 * @expectedException \PHPUnit\Framework\Error\Error
 	 * @expectedExceptionCode E_USER_ERROR
 	 */
 	function testCannotBridgeFinalType() {
