@@ -12,7 +12,7 @@ class PhockitoTostringTest_MockWithoutToString {
 	function Foo() { }
 }
 
-class PhockitoToStringTest extends PHPUnit\Framework\TestCase {
+class PhockitoToStringTest extends \PHPUnit\Framework\TestCase {
 
 	function testCanMockAndOverrideExistingToString() {
 		$mock = Phockito::mock('PhockitoTostringTest_MockWithToString');

@@ -11,7 +11,7 @@ class PhockitoSpiesTest_MockMe {
 	function Baz($response) { return $response; }
 }
 
-class PhockitoSpiesTest extends PHPUnit\Framework\TestCase {
+class PhockitoSpiesTest extends \PHPUnit\Framework\TestCase {
 
 	/** Test stubbing **/
 

@@ -26,7 +26,7 @@ $_PSST_ALL_CLASSES = array(
 	)
 );
 
-class PhockitoSilverStripeTest extends PHPUnit\Framework\TestCase {
+class PhockitoSilverStripeTest extends \PHPUnit\Framework\TestCase {
 
 	static $orig_type_registrar;
 	static $orig_all_classes;

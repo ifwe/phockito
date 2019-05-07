@@ -8,7 +8,7 @@ use SebastianBergmann\Exporter\Exporter;
  *
  * (C) 2011 Hamish Friedlander / SilverStripe. Distributable under the same license as SilverStripe.
  *
- * Patched for php 7.0 and php 7.1 compatibility. Incompatible with php 5.
+ * Patched for php 7.1+ compatibility. Incompatible with php 5.
  *
  * Example usage:
  *
@@ -64,26 +64,26 @@ class Phockito {
 	public static $_instanceid_counter = 0;
 
 	/** Array of most-recent-first calls. Each item is an array of (instance, method, args) named hashes. @var array */
-	public static $_call_list = array();
+	public static $_call_list = [];
 
 	/**
 	 * Array of stubs responses
 	 * Nested as [instance][method][0..n], each item is an array of ('args' => the method args, 'responses' => stubbed responses)
 	 * @var array
 	 */
-	public static $_responses = array();
+	public static $_responses = [];
 
 	/**
 	 * Array of defaults for a given class and method
 	 * @var array
 	 */
-	public static $_defaults = array();
+	public static $_defaults = [];
 
 	/**
 	 * Records whether a given class is an interface, to avoid repeatedly generating reflection objects just to re-call type registrar
 	 * @var array
 	 */
-	public static $_is_interface = array();
+	public static $_is_interface = [];
 
 	/**
 	 * Checks if the two argument sets (passed as arrays) match. Simple serialized check for now, to be replaced by
@@ -173,7 +173,6 @@ class Phockito {
 	 * Passed a class as a string to create the mock as, and the class as a string to mock,
 	 * create the mocking class php and eval it into the current running environment
 	 *
-	 * @static
 	 * @param bool $partial - Should test double be a partial or a full mock
 	 * @param string $mockedClass - The name of the class (or interface) to create a mock of
 	 * @return string The name of the mocker class
@@ -191,7 +190,7 @@ class Phockito {
 		if ($reflect->isFinal()) user_error("Can't mock final class $mockedClass", E_USER_ERROR);
 
 		// Build up an array of php fragments that make the mocking class definition
-		$php = array();
+		$php = [];
 
 		// Get the namespace & the shortname of the mocked class
 		$mockedNamespace = $reflect->getNamespaceName();
@@ -229,7 +228,7 @@ class $mockerShortName $extends $mockedShortName $marker {
 EOT;
 
 		// And record the defaults at the same time
-		self::$_defaults[$mockedClass] = array();
+		self::$_defaults[$mockedClass] = [];
 		// And whether it's an interface
 		self::$_is_interface[$mockedClass] = $reflect->isInterface();
 
@@ -255,10 +254,10 @@ EOT;
 			$byRef = $method->returnsReference() ? "&" : "";
 
 			// PHP fragment that is the arguments definition for this method
-			$defparams = array(); $callparams = array();
+			$defparams = []; $callparams = [];
 
 			// Array of defaults (sparse numeric)
-			self::$_defaults[$mockedClass][$method->name] = array();
+			self::$_defaults[$mockedClass][$method->name] = [];
 
 			foreach ($method->getParameters() as $i => $parameter) {
 				// Turn the method arguments into a php fragment that calls a function with them
@@ -303,9 +302,22 @@ EOT;
 			// What to do if there's no stubbed response
 			if ($partial && !$method->isAbstract()) {
 				$failover = "call_user_func_array(array($mockedClassString, '{$method->name}'), \$args)";
-			}
-			else {
-				$failover = "null";
+			} else {
+				switch (strtolower((string)$returnType)) {
+					case 'bool':
+						$failover = 'false';
+						break;
+					case 'int':
+					case 'float':
+						$failover = '0';
+						break;
+					case 'string':
+						$failover = '""';
+						break;
+					default:
+						$failover = 'null';
+						break;
+				}
 			}
 
 			// Constructor is handled specially. For spies, we do call the parent's constructor. For mocks we ignore
@@ -369,7 +381,7 @@ EOT;
 
 		$php[] = <<<EOT
   function __toString() {
-	\$args = array();
+	\$args = [];
 	\$response = {$phockito}::__called($mockedClassString, \$this->__phockito_instanceid, "__toString", \$args);
 
 	if (\$response) return {$phockito}::__perform_response(\$response, \$args);
@@ -532,7 +544,6 @@ EOT;
 	/**
 	 * When builder. Starts stubbing the method called to build the argument passed to when
 	 *
-	 * @static
 	 * @return Phockito_WhenBuilder
 	 */
 	static function when($arg = null) {
@@ -581,7 +592,6 @@ EOT;
 
 	/**
 	 * Includes the Hamcrest matchers. You don't have to, but if you don't you can't to nice generic stubbing and verification
-	 * @static
 	 * @param bool $as_globals - When true (the default) the hamcrest matchers are available as global functions. If false, they're only available as static methods on Hamcrest_Matchers
 	 */
 	static function include_hamcrest($include_globals = true) {
@@ -630,13 +640,13 @@ class Phockito_WhenBuilder {
 		$instance = $this->instance;
 		$this->method = $method;
 
-		if (!isset(Phockito::$_responses[$instance])) Phockito::$_responses[$instance] = array();
-		if (!isset(Phockito::$_responses[$instance][$method])) Phockito::$_responses[$instance][$method] = array();
+		if (!isset(Phockito::$_responses[$instance])) Phockito::$_responses[$instance] = [];
+		if (!isset(Phockito::$_responses[$instance][$method])) Phockito::$_responses[$instance][$method] = [];
 
 		$this->i = count(Phockito::$_responses[$instance][$method]);
 		Phockito::$_responses[$instance][$method][] = array(
 			'args' => $args,
-			'steps' => array()
+			'steps' => []
 		);
 	}
 
