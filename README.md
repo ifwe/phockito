@@ -1,6 +1,6 @@
-# Phockito - Mockito for PHP 7.x
+# Phockito - Mockito for PHP 7.1+
 
-**This fork adds php 7.0 and 7.1 support**
+**This fork adds php 7.1 support to Phockito**
 
 Mocking framework inspired by Mockito for Java
 
